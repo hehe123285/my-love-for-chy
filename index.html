@@ -1,101 +1,36 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#fff0f4">
-<title>给宝宝的小惊喜 ♡</title>
-<style>
-*{box-sizing:border-box}
-html,body{margin:0;width:100%;height:100%;overflow:hidden}
-body{
-  font-family:"PingFang SC","Microsoft YaHei",sans-serif;
-  color:#9b536d;
-  background:radial-gradient(ellipse at 50% 38%,#fffafc 0%,#fff0f4 48%,#f9dce7 100%);
-  display:flex;align-items:center;justify-content:center;touch-action:manipulation;
-}
-.scene{position:relative;width:100%;height:100%;min-height:500px;display:flex;align-items:center;justify-content:center;overflow:hidden}
-.glow{position:absolute;width:340px;height:340px;border-radius:50%;background:#fff8fb;filter:blur(3px);opacity:.7}
-.float-heart{position:absolute;color:#e9a3ba;opacity:.6;animation:floatUp linear infinite;pointer-events:none}
-@keyframes floatUp{from{transform:translateY(110vh) rotate(0deg);opacity:0}15%{opacity:.6}to{transform:translateY(-15vh) rotate(35deg);opacity:0}}
-.content{position:relative;z-index:2;width:min(92vw,480px);display:flex;flex-direction:column;align-items:center;text-align:center;padding:24px;transition:opacity .55s,transform .55s}
-.envelope-wrap{width:250px;height:180px;position:relative;margin:18px 0 36px;cursor:pointer;animation:bob 3.2s ease-in-out infinite}
-@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
-.envelope{position:absolute;inset:0;background:#eaa9bd;border-radius:8px;box-shadow:0 18px 38px #b96b8830;overflow:visible}
-.envelope:before{content:"";position:absolute;inset:0;background:linear-gradient(145deg,#f5c6d5,#e9a0b8);clip-path:polygon(0 0,50% 60%,100% 0);border-radius:8px 8px 0 0;z-index:3;transform-origin:top;transition:transform .8s cubic-bezier(.2,.7,.2,1)}
-.envelope:after{content:"";position:absolute;inset:0;background:linear-gradient(35deg,#d986a4 0 50%,transparent 50%),linear-gradient(-35deg,#d986a4 0 50%,transparent 50%);clip-path:polygon(0 100%,0 0,50% 58%,100% 0,100% 100%);border-radius:0 0 8px 8px;z-index:4}
-.letter{position:absolute;width:86%;height:130px;left:7%;bottom:8px;background:#fffafc;border-radius:5px;box-shadow:0 5px 20px #9c52651a;display:flex;align-items:center;justify-content:center;font-size:20px;letter-spacing:2px;color:#bd6987;transition:transform .85s cubic-bezier(.2,.7,.2,1);z-index:2}
-.heartseal{position:absolute;z-index:5;left:50%;top:52%;transform:translate(-50%,-50%);font-size:36px;text-shadow:0 3px 9px #a5537330;animation:heartbeat 1.4s ease-in-out infinite}
-@keyframes heartbeat{0%,100%{transform:translate(-50%,-50%) scale(1)}15%{transform:translate(-50%,-50%) scale(1.18)}30%{transform:translate(-50%,-50%) scale(1)}}
-.envelope-wrap.open .envelope:before{transform:rotateX(180deg);z-index:1}
-.envelope-wrap.open .letter{transform:translateY(-105px);z-index:5}
-.envelope-wrap.open .heartseal{opacity:0;transition:opacity .2s}
-.hint{font-size:13px;letter-spacing:2px;color:#c08096;animation:softBlink 2s ease-in-out infinite}
-@keyframes softBlink{0%,100%{opacity:.5}50%{opacity:1}}
-.message{font-size:clamp(28px,7vw,42px);font-weight:600;letter-spacing:3px;color:#c35f83;margin:20px 0 14px;opacity:0;transform:translateY(12px);transition:opacity .8s,transform .8s}
-.message.show{opacity:1;transform:translateY(0)}
-.subheart{font-size:30px;animation:heartbeat 1.4s infinite}
-.continued{font-family:Georgia,serif;font-size:clamp(28px,7vw,42px);font-style:italic;letter-spacing:2px;color:#c35f83;opacity:0;transform:translateY(10px);transition:opacity .8s,transform .8s}
-.continued.show{opacity:1;transform:translateY(0)}
-.footer{position:absolute;bottom:max(22px,env(safe-area-inset-bottom));left:0;width:100%;text-align:center;font-size:12px;letter-spacing:1px;color:#c18499;z-index:10}
-.taparea{position:absolute;inset:0;z-index:1;cursor:pointer}
-.content>*{pointer-events:none}
-.envelope-wrap{pointer-events:auto}
-.scene[data-stage="1"] .content{transform:translateY(-4px)}
-.scene[data-stage="2"] .content{transform:translateY(-10px)}
-.scene[data-stage="3"] .content{transform:translateY(-8px)}
-</style>
-</head>
-<body>
-<div class="scene" id="scene" data-stage="1">
-  <div class="glow"></div>
-  <div id="hearts"></div>
-  <div class="taparea" id="taparea" aria-label="点击屏幕继续"></div>
-  <main class="content">
-    <div class="envelope-wrap" id="envelope" aria-label="打开信封">
-      <div class="envelope">
-        <div class="letter">给最可爱的宝宝 ♡</div>
-        <div class="heartseal">♥</div>
-      </div>
-    </div>
-    <div class="hint" id="hint">点一下，拆开这份小惊喜 ♡</div>
-    <div class="message" id="message">宝宝我喜欢你呀</div>
-    <div class="subheart" id="subheart" style="opacity:0">♡</div>
-    <div class="continued" id="continued">to be continued…</div>
-  </main>
-  <footer class="footer">崔皓禹的宝宝米米制作💗</footer>
-</div>
-<script>
-const scene=document.getElementById('scene'), envelope=document.getElementById('envelope');
-const hint=document.getElementById('hint'), message=document.getElementById('message');
-const subheart=document.getElementById('subheart'), continued=document.getElementById('continued');
-let stage=1;
-function next(){
- if(stage===1){
-   stage=2;scene.dataset.stage='2';envelope.classList.add('open');
-   hint.textContent='再点一下屏幕 ♡';
-   setTimeout(()=>{message.classList.add('show');subheart.style.opacity='1'},420);
- }else if(stage===2){
-   stage=3;scene.dataset.stage='3';message.classList.remove('show');subheart.style.opacity='0';
-   hint.textContent='';envelope.style.opacity='0';envelope.style.transform='translateY(20px)';
-   setTimeout(()=>continued.classList.add('show'),250);
- }else{
-   // Gentle replay from the beginning
-   stage=1;scene.dataset.stage='1';envelope.classList.remove('open');
-   envelope.style.opacity='1';envelope.style.transform='';
-   message.classList.remove('show');subheart.style.opacity='0';continued.classList.remove('show');
-   hint.textContent='点一下，拆开这份小惊喜 ♡';
- }
-}
-document.getElementById('taparea').addEventListener('click',next);
-envelope.addEventListener('click',e=>{e.stopPropagation();if(stage===1)next()});
-const hearts=document.getElementById('hearts');
-for(let i=0;i<18;i++){
- const h=document.createElement('span');h.className='float-heart';h.textContent=['♡','♥','ღ'][i%3];
- h.style.left=(Math.random()*100)+'%';h.style.fontSize=(12+Math.random()*18)+'px';
- h.style.animationDuration=(8+Math.random()*12)+'s';h.style.animationDelay=(-Math.random()*18)+'s';
- hearts.appendChild(h);
-}
-</script>
-</body>
-</html>
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#fff5f7"><title>米米的小秘密花园 ♡</title><style>
+:root{--rose:#c66d8b;--deep:#98536c;--muted:#b78397}*{box-sizing:border-box}html,body{margin:0;min-height:100%;font-family:"PingFang SC","Microsoft YaHei",sans-serif;color:var(--deep)}body{background:radial-gradient(ellipse at 50% 20%,#fffdfd,#fff5f8 42%,#f8e5ec);overflow-x:hidden}button{font:inherit;color:inherit}.screen{min-height:100svh;display:flex;align-items:center;justify-content:center;padding:28px 18px 76px;position:relative;overflow:hidden}.panel,.garden{width:min(100%,760px);position:relative;z-index:2;text-align:center;margin:auto}.eyebrow{font-size:12px;letter-spacing:4px;color:#b78397}h1,h2{font-weight:500;letter-spacing:2px}h1{font-size:clamp(30px,8vw,46px);color:var(--rose);margin:14px 0}p{line-height:1.9}.smallhint{font-size:13px;letter-spacing:1px;color:var(--muted)}.footer{position:fixed;bottom:max(14px,env(safe-area-inset-bottom));left:0;width:100%;text-align:center;font-size:12px;letter-spacing:1px;color:#bd8298;z-index:10}.bg-heart{position:fixed;pointer-events:none;color:#d994ad;opacity:.28;animation:drift linear infinite}@keyframes drift{from{transform:translateY(110vh);opacity:0}15%{opacity:.35}to{transform:translateY(-15vh) rotate(30deg);opacity:0}}.envelope-wrap{width:250px;height:180px;margin:38px auto 30px;position:relative;cursor:pointer;animation:bob 3s ease-in-out infinite}@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}.envelope{position:absolute;inset:0;background:#eaa9bd;border-radius:8px;box-shadow:0 18px 38px #b96b8830}.envelope:before{content:"";position:absolute;inset:0;background:linear-gradient(145deg,#f5c6d5,#e9a0b8);clip-path:polygon(0 0,50% 60%,100% 0);border-radius:8px 8px 0 0;z-index:3;transform-origin:top;transition:transform .8s}.envelope:after{content:"";position:absolute;inset:0;background:linear-gradient(35deg,#d986a4 0 50%,transparent 50%),linear-gradient(-35deg,#d986a4 0 50%,transparent 50%);clip-path:polygon(0 100%,0 0,50% 58%,100% 0,100% 100%);border-radius:0 0 8px 8px;z-index:4}.letter-paper{position:absolute;width:86%;height:130px;left:7%;bottom:8px;background:#fffafc;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:19px;color:#bd6987;transition:transform .85s;z-index:2}.seal{position:absolute;z-index:5;left:50%;top:52%;transform:translate(-50%,-50%);font-size:36px;animation:pulse 1.4s infinite}@keyframes pulse{0%,100%{transform:translate(-50%,-50%) scale(1)}15%{transform:translate(-50%,-50%) scale(1.18)}30%{transform:translate(-50%,-50%) scale(1)}}.open .envelope:before{transform:rotateX(180deg);z-index:1}.open .letter-paper{transform:translateY(-105px);z-index:5}.open .seal{opacity:0}.message,.continued{color:var(--rose);opacity:0;transform:translateY(12px);transition:.8s}.message{font-size:clamp(30px,8vw,44px);font-weight:600;letter-spacing:3px;margin:18px 0}.message.show,.continued.show{opacity:1;transform:none}.continued{font:italic clamp(30px,7vw,42px) Georgia,serif}.btn{border:1px solid #e7b9ca;background:#fff9fb;padding:13px 22px;border-radius:999px;box-shadow:0 8px 20px #c37e9720;cursor:pointer;margin:8px}.btn.primary{background:linear-gradient(135deg,#edb8cb,#d989a7);color:white;border:0}.hidden{display:none!important}.card{background:#ffffffb8;border:1px solid #f1d6e1;border-radius:24px;padding:24px 20px;margin:18px 0;box-shadow:0 12px 30px #bc7d9620;backdrop-filter:blur(8px)}.card h2{font-size:23px;color:var(--rose);margin:6px 0 12px}.counter{display:flex;justify-content:center;gap:9px;flex-wrap:wrap;margin:22px 0}.timebox{min-width:70px;padding:14px 10px;background:#fff5f8;border:1px solid #f1d8e2;border-radius:16px}.timebox strong{display:block;font-size:26px;font-weight:500;color:#c36d8b;font-variant-numeric:tabular-nums}.timebox span{font-size:12px;color:#b78397}.album{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:18px}.photo{position:relative;background:#fff;border-radius:14px;padding:8px 8px 12px;box-shadow:0 5px 15px #bc7d9622;min-width:0}.photo img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:9px;display:block}.photo .caption{font-size:13px;margin:8px 2px 2px;color:#a66b82;word-break:break-word}.addphoto{min-height:160px;border:1.5px dashed #df9fb6;border-radius:15px;background:#fff7fa;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:#c27b96;cursor:pointer}.plus{font-size:42px;font-weight:200}.photoInput{display:none}.notice{font-size:13px;color:#ad7890;line-height:1.7;margin:12px 0}.photo .delete{position:absolute;right:5px;top:5px;width:30px;height:30px;border:0;border-radius:50%;background:#ffffffdd;color:#a75f7b;font-size:18px;cursor:pointer}@media(min-width:600px){.album{grid-template-columns:repeat(3,1fr)}.card{padding:28px}}
+</style></head><body><div id="floating"></div>
+<section class="screen" id="intro"><div class="panel"><div class="eyebrow">A LITTLE SURPRISE FOR YOU</div><div class="envelope-wrap" id="envelope"><div class="envelope"><div class="letter-paper">给最可爱的宝宝 ♡</div><div class="seal">♥</div></div></div><div class="smallhint" id="hint">点一下，拆开这份小惊喜 ♡</div><div class="message" id="message">宝宝我喜欢你呀</div><div id="littleheart" style="font-size:30px;opacity:0;transition:.5s">♡</div><div class="continued" id="continued">to be continued…</div><button class="btn primary hidden" id="enter">进入我们的小花园 ♡</button></div></section>
+<section class="screen hidden" id="main"><main class="garden"><header style="text-align:center;margin:14px 0 26px"><div class="eyebrow">A PLACE JUST FOR US</div><h1>米米的小秘密花园 ♡</h1><p class="smallhint">一点点喜欢，慢慢收集成我们的故事。</p></header><section class="card"><h2>我们在一起的时间</h2><p class="smallhint">从 2026年11月9日 17:23 开始，喜欢你每一天。</p><div class="counter" id="counter"></div></section><section class="card"><h2>我们的回忆相册</h2><p class="smallhint">一起把想珍藏的照片放进这里 ♡</p><label class="addphoto" for="photoInput"><span class="plus">＋</span><span>添加一张回忆</span><span class="smallhint">上传后两个人都能看到</span></label><input class="photoInput" id="photoInput" type="file" accept="image/*" multiple><div class="notice" id="albumStatus">连接共享相册中…</div><div class="album" id="album"></div></section><section class="card" style="padding:30px 18px"><div class="eyebrow">THE END? ♡</div><div class="continued show" style="margin:12px 0">to be continued…</div><p class="smallhint">我们的故事，还在继续。</p></section></main></section><footer class="footer">崔皓禹的宝宝米米制作💗</footer>
+<script type="module">
+/* CLOUD ALBUM SETUP: paste your Firebase config below after creating a Firebase project */
+const firebaseConfig = {
+  apiKey: "PASTE_API_KEY_HERE",
+  authDomain: "PASTE_AUTH_DOMAIN_HERE",
+  projectId: "PASTE_PROJECT_ID_HERE",
+  storageBucket: "PASTE_STORAGE_BUCKET_HERE",
+  appId: "PASTE_APP_ID_HERE"
+};
+const configured= !Object.values(firebaseConfig).some(v=>String(v).startsWith("PASTE_"));
+let db=null,storage=null,auth=null,fbReady=false;
+const albumStatus=document.getElementById('albumStatus'),album=document.getElementById('album'),photoInput=document.getElementById('photoInput');
+if(configured){
+ try{
+  const {initializeApp}=await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js");
+  const {getFirestore,collection,addDoc,deleteDoc,doc,onSnapshot,serverTimestamp}=await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js");
+  const {getStorage,ref,uploadBytes,getDownloadURL,deleteObject}=await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js");
+  const {getAuth,signInAnonymously}=await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js");
+  const app=initializeApp(firebaseConfig);db=getFirestore(app);storage=getStorage(app);auth=getAuth(app);
+  await signInAnonymously(auth);fbReady=true;albumStatus.textContent="云端共享相册已连接 ♡ 上传的照片会同步显示给打开这个网页的人。";
+  const photosRef=collection(db,"sharedAlbum");
+  onSnapshot(photosRef,snapshot=>{renderAlbum(snapshot.docs.map(d=>({id:d.id,...d.data()})))},err=>{albumStatus.textContent="相册加载失败："+err.message});
+  photoInput.addEventListener('change',async()=>{const files=[...photoInput.files];photoInput.value="";for(const file of files){if(!file.type.startsWith("image/"))continue;if(file.size>8*1024*1024){alert("单张照片请控制在8MB以内哦");continue}try{albumStatus.textContent="正在上传照片…";const path="sharedAlbum/"+Date.now()+"_"+Math.random().toString(36).slice(2)+"_"+file.name.replace(/[^\w.\-]/g,"_");const fileRef=ref(storage,path);await uploadBytes(fileRef,file);const url=await getDownloadURL(fileRef);await addDoc(photosRef,{url,path,name:file.name,createdAt:serverTimestamp()});albumStatus.textContent="上传成功！照片已加入共享相册 ♡"}catch(err){albumStatus.textContent="上传失败："+err.message;alert("上传失败，请检查 Firebase 配置和权限规则。")}}});
+  window.deleteSharedPhoto=async(path,id)=>{if(!confirm("确定删除这张共享照片吗？"))return;try{await deleteObject(ref(storage,path));await deleteDoc(doc(db,"sharedAlbum",id))}catch(err){alert("删除失败："+err.message)}};
+ }catch(err){albumStatus.textContent="云端相册尚未连接，请完成下方 Firebase 配置步骤。";console.error(err)}
+}else{albumStatus.textContent="云端相册尚未连接：完成 Firebase 配置后，照片才能在两台设备间共享。";}
+function renderAlbum(items){album.innerHTML="";items.sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));items.forEach(item=>{const card=document.createElement("div");card.className="photo";const img=document.createElement("img");img.src=item.url;img.alt="共享回忆";const caption=document.createElement("div");caption.className="caption";caption.textContent="我们的回忆 ♡";const del=document.createElement("button");del.className="delete";del.textContent="×";del.title="删除照片";del.onclick=()=>window.deleteSharedPhoto(item.path,item.id);card.append(img,del,caption);album.append(card)})}
+const start=new Date(2026,10,9,17,23,0),counter=document.getElementById('counter');function updateCounter(){let s=Math.max(0,Math.floor((Date.now()-start)/1000)),d=Math.floor(s/86400);s%=86400;let h=Math.floor(s/3600);s%=3600;let m=Math.floor(s/60);s%=60;counter.innerHTML=[['天',d],['小时',h],['分钟',m],['秒',s]].map(([u,v])=>`<div class="timebox"><strong>${v}</strong><span>${u}</span></div>`).join('')}updateCounter();setInterval(updateCounter,1000);
+const intro=document.getElementById('intro'),main=document.getElementById('main'),env=document.getElementById('envelope'),hint=document.getElementById('hint'),msg=document.getElementById('message'),heart=document.getElementById('littleheart'),cont=document.getElementById('continued'),enter=document.getElementById('enter');let stage=1;function next(){if(stage===1){stage=2;env.classList.add('open');hint.textContent='再点一下屏幕 ♡';setTimeout(()=>{msg.classList.add('show');heart.style.opacity=1},420)}else if(stage===2){stage=3;msg.classList.remove('show');heart.style.opacity=0;env.style.opacity=0;hint.textContent='';setTimeout(()=>cont.classList.add('show'),250);enter.classList.remove('hidden')}}intro.addEventListener('click',e=>{if(stage<3&&!e.target.closest('#enter'))next()});env.addEventListener('click',e=>{e.stopPropagation();if(stage===1)next()});enter.addEventListener('click',e=>{e.stopPropagation();intro.classList.add('hidden');main.classList.remove('hidden');window.scrollTo(0,0)});
+for(let i=0;i<24;i++){let h=document.createElement('span');h.className='bg-heart';h.textContent=['♡','♥','✧'][i%3];h.style.left=Math.random()*100+'%';h.style.fontSize=13+Math.random()*20+'px';h.style.animationDuration=10+Math.random()*15+'s';h.style.animationDelay=-Math.random()*22+'s';document.getElementById('floating').append(h)}
+</script></body></html>
